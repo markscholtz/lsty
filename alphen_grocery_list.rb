@@ -5,7 +5,7 @@ require 'haml'
 
 include Mongo
 
-DB = Connection.new(ENV['DATABASE_URL'] || 'localhost').db('grocery_list')
+DB = Connection.new(ENV['DATABASE_URL'], ENV['DATABASE_URL_PORT'].to_i || 'localhost').db('grocery_list')
 if ENV['DATABASE_USER'] && ENV['DATABASE_PASSWORD']
   auth = DB.authenticate(ENV['DATABASE_USER'], ENV['DATABASE_PASSWORD'])
 end

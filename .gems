@@ -1,3 +1,4 @@
 sinatra
 mongo
 haml
+bson_ext

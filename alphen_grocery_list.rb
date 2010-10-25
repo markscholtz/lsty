@@ -3,13 +3,21 @@ require 'sinatra'
 require 'mongo'
 require 'haml'
 
+include Mongo
+
+DB = Connection.new(ENV['DATABASE_URL'] || 'localhost').db('grocery_list')
+if ENV['DATABASE_USER'] && ENV['DATABASE_PASSWORD']
+  auth = DB.authenticate(ENV['DATABASE_USER'], ENV['DATABASE_PASSWORD'])
+end
+
 # Routes
 get '/' do
   haml :home
 end
 
 get '/blah' do
-  blah
+  #blah
+  db_test
 end
 
 # Helpers 
@@ -20,5 +28,14 @@ helpers do
       html += "<li>#{i}</li>\n"
     end
     html
+  end
+
+  def db_test
+    collection = DB["lists"]
+    doc = {"name" => "TestDoc"}
+    collection.insert(doc)
+
+    test_doc = DB['lists'].find_one()
+    test_doc.inspect
   end
 end

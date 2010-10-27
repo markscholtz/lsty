@@ -19,27 +19,28 @@ get '/' do
   haml :home
 end
 
-get '/blah' do
-  #blah
-  db_test
+get '/list' do
+  haml :list
+end
+
+post '/list' do
+  save_item params[:grocery_item]
+  haml :list
 end
 
 # Helpers 
 helpers do
-  def blah
+  def get_items
     html = ''
-    (1..10).each do |i|
-      html += "<li>#{i}</li>\n"
+    DB["groceries"].find().each do |item|
+      html += "<li>#{item["item"]}</li>\n"
     end
     html
   end
 
-  def db_test
-    collection = DB["lists"]
-    doc = {"name" => "TestDoc"}
-    collection.insert(doc)
-
-    test_doc = DB['lists'].find_one()
-    test_doc.inspect
+  def save_item(item)
+    groceries_collection = DB["groceries"]
+    grocery_doc = {"item" => "#{item}"}
+    groceries_collection.insert(grocery_doc)
   end
 end

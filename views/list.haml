@@ -1,12 +1,7 @@
-%html
-  %head
-    %meta{'http-equiv' => 'Content-Type', :content => 'text/html; charset=utf-8'}/
-    %title Alphen Grocery List
-  %body
-    %h1 Alphen
-    %p Grocery List
-    %ul
-      = get_items
-    %form{'action' => '/list', 'method' => 'post'}
-      %input{'type' => 'text', 'name' => 'grocery_item'}
-      %input{'type' => 'submit', 'value' => 'save'}
+%h1 Alphen
+%p= @list
+%ul
+  = get_items @list
+%form{'action' => "/list/#{@list}", 'method' => 'post'}
+  %input{'type' => 'text', 'name' => 'grocery_item'}
+  %input{'type' => 'submit', 'value' => 'save'}

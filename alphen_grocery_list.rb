@@ -19,28 +19,47 @@ get '/' do
   haml :home
 end
 
-get '/list' do
+get '/user' do
+  haml :user
+end
+
+post '/user' do
+  create_list params[:list_name]
+  redirect "/list/#{params[:list_name]}"
+end
+
+get '/list/:list' do
+  @list = params[:list]
   haml :list
 end
 
-post '/list' do
-  save_item params[:grocery_item]
-  haml :list
+post '/list/:list' do
+  blah = save_item params[:list], params[:grocery_item]
+  redirect "/list/#{params[:list]}"
 end
 
 # Helpers 
 helpers do
-  def get_items
+  def get_items(list)
     html = ''
-    DB["groceries"].find().each do |item|
-      html += "<li>#{item["item"]}</li>\n"
+    DB["lists"].find("name" => list).each do |item|
+      html += "#{item.inspect}"
+      item["items"].each do |list_item|
+        html += "<li>#{list_item}</li>\n"
+      end
     end
     html
   end
 
-  def save_item(item)
-    groceries_collection = DB["groceries"]
-    grocery_doc = {"item" => "#{item}"}
-    groceries_collection.insert(grocery_doc)
+  def save_item(list_name, item_value)
+    lists = DB["lists"]
+    list = lists.find("name" => "#{list_name}")
+    lists.update( { "name" => "#{list_name}" }, { "$addToSet" => { "items" => "#{item_value}" } } )
+  end
+
+  def create_list(list_name)
+    lists_collection = DB["lists"]
+    list_doc = {"name" => "#{list_name}"}
+    lists_collection.insert(list_doc)
   end
 end

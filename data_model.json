@@ -1,0 +1,35 @@
+{
+    "list_id": "1",
+    "name": "Alphen Grocery List",
+    "type": "simple",
+    "list_items": [
+        {
+            "list_item_id": "1",
+            "item_name": "bread" 
+        },
+        {
+            "list_item_id": "2",
+            "item_name": "milk" 
+        },
+        {
+            "list_item_id": "3",
+            "item_name": "eggs" 
+        } 
+    ],
+    "creator": 1,
+    "users": [1,2,3,5],
+    "groups": [3,4]
+}
+
+{
+    "user_id": 1,
+    "email": "markscholtz@gmail.com",
+    "name": "Mark Scholtz",
+    "Groups": [1,4]
+}
+
+{
+    "group_id": 4,
+    "name": "Alphen Devs",
+    "Users": [1,2]
+}

@@ -5,9 +5,7 @@
   %body
     %ul
       %li 
-        %a(title='Home' href='/') Home
+        %a(title="Home" href="/#{@user ? 'users/' + @user : ''}") Home
       %li 
-        %a(title='User' href='/user') User
-      %li 
-        %a(title='List' href='/list/default') List
+        %a(title='Register' href='/register') Register
     = yield

@@ -1,4 +1,6 @@
 %h1 Create List
-%form{'action' => '/user', 'method' => 'post'}
+%ul
+  = get_lists @user
+%form{'action' => "/users/#{@user}", 'method' => 'post'}
   %input{'type' => 'text', 'name' => 'list_name'}
   %input{'type' => 'submit', 'value' => 'save'}

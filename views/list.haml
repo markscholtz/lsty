@@ -1,7 +1,6 @@
-%h1 Alphen
-%h2= @list
+%h1= get_list_name @list_id
 %ul
-  = get_items @list, @user
-%form{'action' => "/users/#{@user}/lists/#{@list}", 'method' => 'post'}
+  = get_items @list_id
+%form{'action' => "/#{@list_id}", 'method' => 'post'}
   %input{'type' => 'text', 'name' => 'grocery_item'}
   %input{'type' => 'submit', 'value' => 'save'}

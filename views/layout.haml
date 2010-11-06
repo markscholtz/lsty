@@ -1,11 +1,11 @@
 %html
   %head
-    %meta{'http-equiv' => 'Content-Type', :content => 'text/html; charset=utf-8'}/
-    %title Alphen Grocery List - Home
+    %title= @list_id ? @list_id : 'Home'
   %body
+    #main
     %ul
       %li 
-        %a(title="Home" href="/#{@user ? 'users/' + @user : ''}") Home
-      %li 
-        %a(title='Register' href='/register') Register
+        %a(title="Home" href='/') Home
     = yield
+    #lists
+      = get_all_lists

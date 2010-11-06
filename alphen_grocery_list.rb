@@ -16,61 +16,62 @@ end
 
 # Routes
 get '/' do
-  haml :home
+  haml :create
 end
 
 post '/' do
-  login_user params[:username], params[:password]
+  create_list params[:list_name]
 end
 
-get '/register' do
-  haml :register
-end
-
-post '/register' do
-  create_user params[:username], params[:password]
-  redirect "/users/#{params[:username]}"
-end
-
-get '/users/:user' do
-  @user = params[:user]
-  haml :user
-end
-
-post '/users/:user' do
-  @user = params[:user]
-  create_list params[:list_name], params[:user]
-  redirect "/users/#{@user}/lists/#{params[:list_name].gsub(" ", "_")}"
-end
-
-get '/users/:user/lists/:list' do
-  @user = params[:user]
-  @list = params[:list]
+get '/:list_id' do
+  @list_id = params[:list_id]
   haml :list
 end
 
-post '/users/:user/lists/:list' do
-  @user = params[:user]
-  @list = params[:list]
-  save_item @user, @list, params[:grocery_item]
-  redirect "/users/#{@user}/lists/#{@list}"
+post '/:list_id' do
+  @list_id = params[:list_id]
+  save_item @list_id, params[:grocery_item]
+  #redirect "/#{@list_id}"
 end
 
 # Helpers 
 helpers do
-  def login_user(user, password)
-    DB["users"].find("user" => user, "password" => password).each do |login_success|
-      redirect "/users/#{user}"
+  def create_list(list_name)
+    lists_collection = DB["lists"]
+    list_doc = {"name" => "#{list_name}"}
+    if list_id = lists_collection.insert(list_doc)
+      redirect "/#{list_id}"
     end
-    redirect '/'
   end
 
-  def get_items(list, user)
+  def get_list(list_id)
+    DB["lists"].find("_id" => BSON::ObjectId(list_id)).each do |list|
+      redirect "/#{list_id}"
+    end
+  end
+
+  def get_list_name(list_id)
+    list_name = ''
+    DB["lists"].find("_id" => BSON::ObjectId(list_id)).each do |list|
+      list_name = list["name"]
+    end
+    list_name
+  end
+
+  def get_all_lists 
     html = ''
-    DB["lists"].find("name" => list, "user" => user).each do |item|
-      #html += "#{item.inspect}"
-      if item["items"]
-        item["items"].each do |list_item|
+    DB["lists"].find().each do |list|
+      html += "<li><a title='#{list["name"]}' href='/#{list["_id"]}'>#{list["name"]}</a></li>\n"
+    end
+    html
+  end
+
+  def get_items(list_id)
+    html = ''
+    DB["lists"].find("_id" => BSON::ObjectId(list_id)).each do |list|
+      html += "#{list.inspect}"
+      if list["items"]
+        list["items"].each do |list_item|
           html += "<li>#{list_item}</li>\n"
         end
       end
@@ -78,37 +79,12 @@ helpers do
     html
   end
 
-  def get_lists(user)
-    @user = user
-    html = ''
-    DB["lists"].find("user" => @user).each do |list|
-      #html += "#{list.inspect}"
-      html += <<-HTML 
-          <li>
-            <a title=#{list["name"]} href="/users/#{@user}/lists/#{list["name"]}">#{list["name"].gsub("_"," ")}</a>
-          </li>\n
-        HTML
-    end
-    html
-  end
-
-  def create_user(user, password)
-    users_collection = DB["users"]
-    user_doc = {"user" => user, "password" => password}
-    users_collection.insert(user_doc)
-  end
-
-  def save_item(user, list_name, item_value)
+  def save_item(list_id, item_value)
     if item_value
       lists = DB["lists"]
-      #list = lists.find("name" => list_name, "user" => user)
-      lists.update( { "name" => list_name, "user" => user }, { "$addToSet" => { "items" => item_value } } )
+      lists.update( { "_id" => BSON::ObjectId(list_id) }, { "$addToSet" => { "items" => item_value } } )
+      #lists.update( { "name" => "qqq" }, { "$addToSet" => { "items" => item_value } } )
     end
-  end
-
-  def create_list(list_name, user)
-    lists_collection = DB["lists"]
-    list_doc = {"name" => "#{list_name.gsub(' ', '_')}", "user" => user}
-    lists_collection.insert(list_doc)
+    redirect "/#{list_id}"
   end
 end

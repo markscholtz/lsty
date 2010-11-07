@@ -4,6 +4,7 @@ require 'mongo'
 require 'haml'
 
 include Mongo
+use Rack::MethodOverride #required for Sinatra PUT and DELETE methods (browser hack)
 
 DB = Connection.new(ENV['DATABASE_URL'], ENV['DATABASE_URL_PORT'].to_i || 'localhost').db('grocery_list')
 if ENV['DATABASE_USER'] && ENV['DATABASE_PASSWORD']
@@ -31,7 +32,12 @@ end
 post '/:list_id' do
   @list_id = params[:list_id]
   save_item @list_id, params[:grocery_item]
-  #redirect "/#{@list_id}"
+end
+
+delete '/:list_id/:list_item' do
+  @list_id = params[:list_id]
+  @list_item = params[:list_item]
+  delete_item @list_id, @list_item
 end
 
 # Helpers 
@@ -69,10 +75,18 @@ helpers do
   def get_items(list_id)
     html = ''
     DB["lists"].find("_id" => BSON::ObjectId(list_id)).each do |list|
-      html += "#{list.inspect}"
+      #html += "#{list.inspect}"
       if list["items"]
         list["items"].each do |list_item|
-          html += "<li>#{list_item}</li>\n"
+          html += <<-HTML
+              <li class="list_item">
+                <form method="post" action="/#{list_id}/#{list_item}">
+                  <span class="list_text">#{list_item}</span>
+                  <input type="hidden" name="_method" value="delete" />
+                  <input class="list_delete" type="submit" value="delete">
+                </form>
+              </li>\n
+            HTML
         end
       end
     end
@@ -83,8 +97,24 @@ helpers do
     if item_value
       lists = DB["lists"]
       lists.update( { "_id" => BSON::ObjectId(list_id) }, { "$addToSet" => { "items" => item_value } } )
-      #lists.update( { "name" => "qqq" }, { "$addToSet" => { "items" => item_value } } )
+      #lists.update( { "_id" => BSON::ObjectId(list_id) }, { "$addToSet" => { "items" => item_value } } )
     end
     redirect "/#{list_id}"
+  end
+
+  def delete_item(list_id, list_item)
+    if list_item
+      lists = DB["lists"]
+      lists.update( { "_id" => BSON::ObjectId(list_id) }, { "$pull" => { "items" => list_item } } )
+    end
+    redirect "/#{@list_id}"
+  end
+
+  def complete_item(list_id, list_item)
+    if list_item
+      lists = DB["lists"]
+      lists.update( { "_id" => BSON::ObjectId(list_id) }, { "$pull" => { "items" => list_item } } )
+    end
+    redirect "/#{@list_id}"
   end
 end

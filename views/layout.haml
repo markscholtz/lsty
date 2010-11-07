@@ -1,11 +1,12 @@
 %html
   %head
+    %link{ :type => "text/css", :rel => "stylesheet", :href => "/stylesheets/defaults.css" }
     %title= @list_id ? @list_id : 'Home'
   %body
     #main
-    %ul
-      %li 
-        %a(title="Home" href='/') Home
-    = yield
-    #lists
+      = yield
+    #footer
+      %ul
+        %li 
+          %a(title="Home" href='/') Home
       = get_all_lists

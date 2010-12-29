@@ -8,5 +8,5 @@ Listy was created to be a playground for a few technologies that I have
 not yet tried (mongoDB, HAML, Sinatra, Heroku).
 
 ## Current progress ##
-Check out the [issue page](https://github.com/markscholtz/listy/issues)
+Check out the [issue page](https://github.com/markscholtz/lsty/issues)
 for outstanding features, bugs, etc
